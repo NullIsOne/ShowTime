@@ -49,10 +49,10 @@ public final class ShowTime: NSObject {
     /// (3pt by default)
     @objc public static var strokeWidth: CGFloat = 3
     
-    /// The size of the touch circles.
+    /// The diametr of the touch circles.
     /// (44pt x 44pt by default)
-    @objc public static var size = CGSize(width: 44, height: 44) // TODO: Just make CGFloat
-    
+    @objc public static var size: CGFloat = 44
+
     /// The style of animation to use when hiding a visual touch.
     /// (`.standard` by default)
     public static var disappearAnimation: Animation = .standard
@@ -112,10 +112,10 @@ class TouchView: UILabel {
     ///   - view: A view the touch is relative to, typically the window calling `sendEvent(_:)`.
     convenience init(touch: UITouch, relativeTo view: UIView) {
         let location = touch.location(in: view)
-        self.init(frame: CGRect(x: location.x - ShowTime.size.width / 2,
-                                y: location.y - ShowTime.size.height / 2,
-                                width: ShowTime.size.width,
-                                height: ShowTime.size.height))
+        self.init(frame: CGRect(x: location.x - ShowTime.size / 2,
+                                y: location.y - ShowTime.size / 2,
+                                width: ShowTime.size,
+                                height: ShowTime.size))
         style(with: touch)
     }
     
@@ -126,7 +126,7 @@ class TouchView: UILabel {
     ///   - view: A view the touch is relative to, typically the window calling `sendEvent(_:)`.
     func update(with touch: UITouch, relativeTo view: UIView) {
         let location = touch.location(in: view)
-        frame = CGRect(x: location.x - ShowTime.size.width / 2, y: location.y - ShowTime.size.height / 2, width: ShowTime.size.width, height: ShowTime.size.height)
+        frame = CGRect(x: location.x - ShowTime.size / 2, y: location.y - ShowTime.size / 2, width: ShowTime.size, height: ShowTime.size)
         if ShowTime.shouldShowForce {
             let scale = 1 + (0.5 * touch.normalizedForce)
             CATransaction.begin()
@@ -167,7 +167,7 @@ class TouchView: UILabel {
     }
     
     private func style(with touch: UITouch) {
-        layer.cornerRadius = ShowTime.size.height / 2
+        layer.cornerRadius = ShowTime.size / 2
         layer.borderColor = ShowTime.strokeColor.cgColor
         layer.borderWidth = ShowTime.strokeWidth
         backgroundColor = ShowTime.fillColor == .auto ? ShowTime.strokeColor.withAlphaComponent(0.5) : ShowTime.fillColor
