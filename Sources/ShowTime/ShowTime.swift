@@ -185,13 +185,18 @@ var _touches = [UITouch : TouchView]()
 
 extension UIWindow {
     
+    struct Swizzled { static var once = false } // Workaround for missing dispatch_once in Swift 3
+
     open override var layer: CALayer {
-        UIWindow.swizzle() // TODO: Only swizzle when enabled
+        if ShowTime.shouldEnable {
+            UIWindow.swizzle()
+        } else {
+            UIWindow.unswizzle()
+        }
         return super.layer
     }
     
     private class func swizzle() { // `initialize()` removed in Swift 4
-        struct Swizzled { static var once = false } // Workaround for missing dispatch_once in Swift 3
         guard !Swizzled.once else { return }
         Swizzled.once = true
         guard let original = class_getInstanceMethod(self, #selector(UIWindow.sendEvent(_:))) else { return }
@@ -199,6 +204,14 @@ extension UIWindow {
         method_exchangeImplementations(original, new)
     }
     
+    private class func unswizzle() {
+        guard Swizzled.once else { return }
+        Swizzled.once = false
+        guard let original = class_getInstanceMethod(self, #selector(UIWindow.sendEvent(_:))) else { return }
+        guard let new = class_getInstanceMethod(self, #selector(UIWindow.swizzled_sendEvent(_:))) else { return }
+        method_exchangeImplementations(new, original)
+    }
+
     @objc private func swizzled_sendEvent(_ event: UIEvent) {
         swizzled_sendEvent(event)
         guard ShowTime.shouldEnable else { return removeAllTouchViews() }
