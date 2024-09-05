@@ -32,10 +32,10 @@ public final class ShowTime: NSObject {
     }
     
     /// Whether ShowTime is enabled.
-    /// ShowTime automatically enables itself by default.
-    /// (`.always` by default)
-    @objc public static var enabled: Enabled = .always
-    
+    /// ShowTime automatically disabled by default.
+    /// (`.never` by default)
+    @objc public static var enabled: Enabled = .never
+
     /// The fill (background) colour of the visual touches.
     /// If set to `.auto`, ShowTime automatically uses the stroke color with 50% alpha.
     /// (`.auto` by default)
